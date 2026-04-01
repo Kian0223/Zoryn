@@ -19,73 +19,41 @@ class GroceryPurchase extends Model
             LEFT JOIN users u ON u.id = gp.created_by
             ORDER BY gp.id DESC
         ");
-        $rows = $this->db->resultSet();
-        foreach ($rows as &$row) {
-            $row['items'] = $this->getItems((int)$row['id']);
-        }
-        return $rows;
-    }
-
-    public function getItems(int $purchaseId): array
-    {
-        $this->db->query("
-            SELECT gpi.*, g.grocery_name, g.unit
-            FROM grocery_purchase_items gpi
-            LEFT JOIN groceries g ON g.id = gpi.grocery_id
-            WHERE gpi.purchase_id = :purchase_id
-            ORDER BY gpi.id ASC
-        ");
-        $this->db->bind(':purchase_id', $purchaseId);
         return $this->db->resultSet();
     }
 
-    public function createFromPO(array $po, array $poItems, ?int $createdBy): int|false
+    public function applySupplierCredit(int $purchaseId, float $amount): bool
     {
-        $purchaseNo = 'GP-' . date('Ymd-His') . '-' . rand(100, 999);
-        $totalAmount = 0;
-        foreach ($poItems as $item) {
-            $totalAmount += (float)$item['line_total'];
-        }
+        $this->db->query("
+            SELECT total_amount, amount_paid, supplier_credit_applied
+            FROM grocery_purchases
+            WHERE id = :id
+            LIMIT 1
+        ");
+        $this->db->bind(':id', $purchaseId);
+        $purchase = $this->db->single();
+        if (!$purchase) return false;
+
+        $applied = (float)($purchase['supplier_credit_applied'] ?? 0) + $amount;
+        $paid = (float)($purchase['amount_paid'] ?? 0);
+        $total = (float)($purchase['total_amount'] ?? 0);
+        $balanceDue = max(0, $total - $paid - $applied);
+
+        $paymentStatus = 'unpaid';
+        if (($paid + $applied) > 0 && $balanceDue > 0) $paymentStatus = 'partial';
+        if ($balanceDue <= 0) $paymentStatus = 'paid';
 
         $this->db->query("
-            INSERT INTO grocery_purchases (
-                purchase_no, supplier_id, source_po_id, purchase_date, due_date, status, total_amount,
-                amount_paid, balance_due, payment_status, expense_posted, notes, created_by, created_at
-            ) VALUES (
-                :purchase_no, :supplier_id, :source_po_id, CURDATE(), NULL, 'draft', :total_amount,
-                0, :balance_due, 'unpaid', 0, :notes, :created_by, NOW()
-            )
+            UPDATE grocery_purchases
+            SET supplier_credit_applied = :supplier_credit_applied,
+                balance_due = :balance_due,
+                payment_status = :payment_status
+            WHERE id = :id
         ");
-        $this->db->bind(':purchase_no', $purchaseNo);
-        $this->db->bind(':supplier_id', $po['supplier_id']);
-        $this->db->bind(':source_po_id', $po['id']);
-        $this->db->bind(':total_amount', $totalAmount);
-        $this->db->bind(':balance_due', $totalAmount);
-        $this->db->bind(':notes', 'Generated from PO ' . ($po['po_no'] ?? ''));
-        $this->db->bind(':created_by', $createdBy);
-
-        if (!$this->db->execute()) return false;
-        $purchaseId = (int)$this->db->lastInsertId();
-
-        foreach ($poItems as $item) {
-            $orderedQty = (float)($item['ordered_qty'] ?? 0);
-            $unitCost = (float)($item['unit_cost'] ?? 0);
-            $this->db->query("
-                INSERT INTO grocery_purchase_items (
-                    purchase_id, grocery_id, package_count, package_quantity, package_cost, total_quantity, line_total
-                ) VALUES (
-                    :purchase_id, :grocery_id, 1, :package_quantity, :package_cost, :total_quantity, :line_total
-                )
-            ");
-            $this->db->bind(':purchase_id', $purchaseId);
-            $this->db->bind(':grocery_id', $item['grocery_id']);
-            $this->db->bind(':package_quantity', $orderedQty);
-            $this->db->bind(':package_cost', $unitCost * $orderedQty);
-            $this->db->bind(':total_quantity', $orderedQty);
-            $this->db->bind(':line_total', $unitCost * $orderedQty);
-            if (!$this->db->execute()) return false;
-        }
-
-        return $purchaseId;
+        $this->db->bind(':supplier_credit_applied', $applied);
+        $this->db->bind(':balance_due', $balanceDue);
+        $this->db->bind(':payment_status', $paymentStatus);
+        $this->db->bind(':id', $purchaseId);
+        return $this->db->execute();
     }
 }

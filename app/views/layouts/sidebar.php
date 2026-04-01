@@ -4,6 +4,7 @@ $currentUrl = $_GET['url'] ?? 'dashboard/index';
 
 $menuItems = [
     ['label' => 'Dashboard', 'icon' => 'bi-grid-1x2-fill', 'url' => '/dashboard/index', 'match' => 'dashboard'],
+    ['label' => 'Supplier Returns', 'icon' => 'bi-arrow-return-left', 'url' => '/supplierreturns/index', 'match' => 'supplierreturns'],
     ['label' => 'Supplier POs', 'icon' => 'bi-file-earmark-text', 'url' => '/supplierpurchaseorders/index', 'match' => 'supplierpurchaseorders'],
     ['label' => 'Purchase Planning', 'icon' => 'bi-clipboard2-check', 'url' => '/purchaseplans/index', 'match' => 'purchaseplans'],
     ['label' => 'Inventory Forecast', 'icon' => 'bi-graph-down-arrow', 'url' => '/inventoryforecast/index', 'match' => 'inventoryforecast'],
