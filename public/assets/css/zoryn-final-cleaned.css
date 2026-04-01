@@ -1,0 +1,1111 @@
+/* Zoryn Restaurant - Final Cleaned CSS
+   Combined from style.css + batch1.css ... batch14.css
+   Includes analytics chart height fixes.
+*/
+
+
+
+/* ===== style.css ===== */
+
+:root {
+    --zoryn-bg: #080808;
+    --zoryn-bg-soft: #121212;
+    --zoryn-panel: rgba(255, 255, 255, 0.05);
+    --zoryn-panel-strong: rgba(255, 255, 255, 0.08);
+    --zoryn-border: rgba(212, 175, 55, 0.18);
+    --zoryn-border-strong: rgba(212, 175, 55, 0.32);
+    --zoryn-gold: #d4af37;
+    --zoryn-gold-soft: #f2d27a;
+    --zoryn-gold-deep: #b7860b;
+    --zoryn-text: #f6f1df;
+    --zoryn-muted: rgba(246, 241, 223, 0.7);
+}
+
+html, body {
+    min-height: 100%;
+}
+
+body {
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.12), transparent 24%),
+        radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.08), transparent 20%),
+        linear-gradient(135deg, #050505 0%, #0d0d0d 45%, #161616 100%);
+    color: var(--zoryn-text);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.auth-bg {
+    background: linear-gradient(135deg, #111827, #374151);
+}
+
+.login-card {
+    width: 100%;
+    max-width: 430px;
+    border-radius: 20px;
+}
+
+.content-area {
+    min-height: 100vh;
+}
+
+.stat-card {
+    border-radius: 18px;
+}
+
+.login-page-wrapper {
+    background:
+        radial-gradient(circle at top left, rgba(212, 175, 55, 0.16), transparent 32%),
+        radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.1), transparent 28%),
+        linear-gradient(135deg, #050505 0%, #111111 48%, #1a1a1a 100%);
+}
+
+.login-shell {
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    backdrop-filter: blur(4px);
+}
+
+.login-form-panel {
+    background: linear-gradient(180deg, rgba(14, 14, 14, 0.98), rgba(24, 24, 24, 0.97));
+    color: #f5f5f5;
+    min-height: 720px;
+}
+
+.login-hero-panel {
+    position: relative;
+    min-height: 420px;
+    background-image: url('../images/zoryn-login-hero.png');
+    background-size: cover;
+    background-position: center;
+}
+
+.login-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.76)),
+        linear-gradient(135deg, rgba(13, 13, 13, 0.18), rgba(13, 13, 13, 0.88));
+}
+
+.login-hero-content {
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 2rem;
+    color: #fff8e7;
+}
+
+.brand-mark,
+.zoryn-brand-mark {
+    width: 62px;
+    height: 62px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #0f0f0f;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+    box-shadow: 0 10px 24px rgba(201, 154, 28, 0.25);
+}
+
+.login-kicker,
+.zoryn-hero-kicker,
+.zoryn-panel-kicker,
+.zoryn-panel-label,
+.zoryn-brand-tag {
+    color: var(--zoryn-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.login-title {
+    color: #ffffff;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 800;
+}
+
+.login-subtitle,
+.zoryn-page-subtitle {
+    color: rgba(255, 255, 255, 0.76);
+    max-width: 720px;
+}
+
+.login-label {
+    color: #f3df9b;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.login-input-group {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.login-input-group .input-group-text {
+    background: transparent;
+    border: 0;
+    color: #d4af37;
+    padding-left: 1rem;
+}
+
+.login-input {
+    background: transparent;
+    border: 0;
+    color: #ffffff;
+    padding: 0.95rem 1rem 0.95rem 0.25rem;
+}
+
+.login-input:focus {
+    background: transparent;
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.login-input::placeholder {
+    color: rgba(255, 255, 255, 0.38);
+}
+
+.login-btn,
+.zoryn-btn-gold {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 16px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #111111;
+    text-decoration: none;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+    box-shadow: 0 14px 28px rgba(201, 154, 28, 0.2);
+    padding: 0.9rem 1.15rem;
+}
+
+.login-btn:hover,
+.zoryn-btn-gold:hover {
+    color: #111111;
+    background: linear-gradient(135deg, #f6dc93, #d8ab36);
+}
+
+.login-alert {
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    background: rgba(212, 175, 55, 0.12);
+    color: #fff0be;
+    border-radius: 14px;
+}
+
+.login-note {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1rem;
+    color: rgba(255, 255, 255, 0.72);
+}
+
+.hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 248, 231, 0.25);
+    background: rgba(0, 0, 0, 0.35);
+    color: #f4d77f;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.hero-title {
+    font-size: clamp(1.7rem, 3vw, 2.65rem);
+    line-height: 1.15;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    max-width: 640px;
+}
+
+.hero-text {
+    max-width: 620px;
+    color: rgba(255, 248, 231, 0.88);
+    font-size: 1rem;
+}
+
+.hero-contact-box {
+    margin-top: 1.5rem;
+    padding: 1rem 1.1rem;
+    border-radius: 18px;
+    background: rgba(0, 0, 0, 0.42);
+    border: 1px solid rgba(255, 248, 231, 0.12);
+    max-width: 650px;
+}
+
+.hero-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: rgba(255, 248, 231, 0.96);
+    margin-bottom: 0.55rem;
+}
+
+.hero-contact-item:last-child {
+    margin-bottom: 0;
+}
+
+.hero-contact-item i {
+    color: #f2d27a;
+}
+
+.zoryn-admin-shell {
+    display: flex;
+    min-height: 100vh;
+}
+
+.zoryn-sidebar {
+    width: 295px;
+    flex-shrink: 0;
+    padding: 1.25rem;
+}
+
+.zoryn-sidebar-inner {
+    min-height: calc(100vh - 2.5rem);
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem;
+    border-radius: 28px;
+    background: linear-gradient(180deg, rgba(7, 7, 7, 0.95), rgba(20, 20, 20, 0.98));
+    border: 1px solid var(--zoryn-border);
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.28);
+}
+
+.zoryn-brand-block {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-bottom: 1.25rem;
+    margin-bottom: 1.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.zoryn-brand-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.1;
+}
+
+.zoryn-nav {
+    gap: 0.4rem;
+}
+
+.zoryn-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+    border: 1px solid transparent;
+    transition: 0.2s ease;
+}
+
+.zoryn-nav-link:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(212, 175, 55, 0.1);
+}
+
+.zoryn-nav-link.active {
+    color: #111111;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+    border-color: rgba(242, 210, 122, 0.35);
+    box-shadow: 0 10px 24px rgba(201, 154, 28, 0.16);
+}
+
+.zoryn-nav-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    font-size: 1rem;
+}
+
+.zoryn-nav-link.active .zoryn-nav-icon {
+    background: rgba(17, 17, 17, 0.12);
+}
+
+.zoryn-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 1.15rem;
+}
+
+.zoryn-user-card {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.zoryn-user-avatar {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: #111111;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+}
+
+.zoryn-user-name {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.zoryn-user-role {
+    color: var(--zoryn-muted);
+    font-size: 0.92rem;
+}
+
+.zoryn-logout-link,
+.zoryn-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    padding: 0.88rem 1rem;
+    border-radius: 16px;
+    color: var(--zoryn-gold-soft);
+    text-decoration: none;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.zoryn-logout-link:hover,
+.zoryn-btn-outline:hover {
+    color: #fff6d3;
+    background: rgba(212, 175, 55, 0.08);
+}
+
+.zoryn-main-content {
+    flex-grow: 1;
+    padding: 1.25rem 1.25rem 1.25rem 0;
+}
+
+.zoryn-top-hero {
+    position: relative;
+    overflow: hidden;
+    border-radius: 30px;
+    min-height: 265px;
+    padding: 2rem;
+    background-image: url('../images/zoryn-login-hero.png');
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--zoryn-border);
+}
+
+.zoryn-top-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.64) 48%, rgba(0, 0, 0, 0.56) 100%),
+        linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(212, 175, 55, 0.02));
+}
+
+.zoryn-top-hero-content {
+    position: relative;
+    z-index: 1;
+    min-height: 220px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.zoryn-page-title {
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0.35rem 0 0.65rem;
+}
+
+.zoryn-role-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    white-space: nowrap;
+    padding: 0.85rem 1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    color: #fff5cf;
+    font-weight: 700;
+}
+
+.zoryn-stat-card,
+.zoryn-panel {
+    height: 100%;
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.9), rgba(11, 11, 11, 0.96));
+    border: 1px solid var(--zoryn-border);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+}
+
+.zoryn-stat-card {
+    padding: 1.35rem;
+}
+
+.zoryn-stat-card-highlight {
+    border-color: rgba(242, 210, 122, 0.32);
+}
+
+.zoryn-stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(212, 175, 55, 0.14);
+    color: var(--zoryn-gold-soft);
+    font-size: 1.35rem;
+    margin-bottom: 1rem;
+}
+
+.zoryn-stat-label {
+    color: var(--zoryn-muted);
+    font-size: 0.95rem;
+}
+
+.zoryn-stat-value {
+    color: #ffffff;
+    font-size: clamp(1.9rem, 2.8vw, 2.4rem);
+    font-weight: 800;
+    margin-top: 0.5rem;
+}
+
+.zoryn-panel {
+    padding: 1.4rem;
+}
+
+.zoryn-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.zoryn-panel h5,
+.zoryn-action-title {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+.zoryn-table {
+    color: var(--zoryn-text);
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--zoryn-text);
+    --bs-table-border-color: rgba(255, 255, 255, 0.06);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-hover-color: var(--zoryn-text);
+}
+
+.zoryn-table thead th {
+    color: var(--zoryn-gold-soft);
+    font-weight: 700;
+    border-bottom-color: rgba(212, 175, 55, 0.16);
+}
+
+.zoryn-table-pill {
+    display: inline-flex;
+    padding: 0.38rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.16);
+    color: #ffe7a7;
+    font-weight: 700;
+    font-size: 0.88rem;
+}
+
+.zoryn-summary-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+}
+
+.zoryn-summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--zoryn-muted);
+}
+
+.zoryn-summary-item strong {
+    color: #ffffff;
+    font-size: 1.05rem;
+}
+
+.zoryn-action-box {
+    padding: 1.1rem;
+    border-radius: 20px;
+    background: linear-gradient(180deg, rgba(212, 175, 55, 0.08), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.card,
+.modal-content,
+.dropdown-menu,
+.list-group-item,
+.table,
+.form-control,
+.form-select,
+select,
+textarea,
+.input-group-text {
+    background-color: unset;
+}
+
+.card,
+.modal-content {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+    border: 1px solid var(--zoryn-border);
+    color: var(--zoryn-text);
+    border-radius: 24px;
+}
+
+.card .text-muted,
+.text-muted {
+    color: var(--zoryn-muted) !important;
+}
+
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-color: var(--zoryn-text);
+    --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+    --bs-table-striped-color: var(--zoryn-text);
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.03);
+    --bs-table-hover-color: var(--zoryn-text);
+    --bs-table-border-color: rgba(255, 255, 255, 0.06);
+}
+
+.table thead th {
+    color: var(--zoryn-gold-soft);
+    border-bottom-color: rgba(212, 175, 55, 0.16);
+}
+
+.form-control,
+.form-select,
+select,
+textarea,
+.input-group-text {
+    background: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(212, 175, 55, 0.18) !important;
+    border-radius: 14px !important;
+}
+
+.form-control::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.form-control:focus,
+.form-select:focus,
+select:focus,
+textarea:focus {
+    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.14) !important;
+    border-color: rgba(242, 210, 122, 0.45) !important;
+}
+
+/* GLOBAL DROPDOWN FIX */
+.form-select,
+select {
+    min-height: 48px;
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(212, 175, 55, 0.18) !important;
+    border-radius: 14px !important;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.form-select option,
+select option {
+    background-color: #121212 !important;
+    color: #f6f1df !important;
+}
+
+.form-select option[value=""],
+select option[value=""] {
+    color: rgba(246, 241, 223, 0.7) !important;
+}
+
+.form-select:focus,
+select:focus {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    color: #ffffff !important;
+    border-color: rgba(242, 210, 122, 0.45) !important;
+    box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.14) !important;
+    outline: none !important;
+}
+
+.btn-primary,
+.btn-dark {
+    border: 0;
+    color: #111111;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+}
+
+.btn-primary:hover,
+.btn-dark:hover {
+    color: #111111;
+    background: linear-gradient(135deg, #f6dc93, #d8ab36);
+}
+
+.btn-outline-dark,
+.btn-outline-secondary,
+.btn-secondary {
+    color: var(--zoryn-gold-soft);
+    border-color: rgba(212, 175, 55, 0.24);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.btn-outline-dark:hover,
+.btn-outline-secondary:hover,
+.btn-secondary:hover {
+    color: #fff6d3;
+    background: rgba(212, 175, 55, 0.08);
+    border-color: rgba(212, 175, 55, 0.34);
+}
+
+.alert {
+    border-radius: 16px;
+}
+
+@media (max-width: 1199.98px) {
+    .zoryn-sidebar {
+        width: 250px;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .login-form-panel {
+        min-height: auto;
+    }
+
+    .login-hero-panel {
+        min-height: 360px;
+    }
+
+    .zoryn-admin-shell {
+        flex-direction: column;
+    }
+
+    .zoryn-sidebar {
+        width: 100%;
+        padding-right: 1.25rem;
+    }
+
+    .zoryn-sidebar-inner {
+        min-height: auto;
+    }
+
+    .zoryn-main-content {
+        padding-left: 1.25rem;
+    }
+
+    .zoryn-top-hero-content,
+    .zoryn-panel-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+
+
+
+/* ===== batch1.css ===== */
+
+.zoryn-mini-stat {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.15rem;
+    color: var(--zoryn-muted);
+}
+.zoryn-mini-stat strong {
+    color: #fff6d3;
+    font-size: 1.1rem;
+}
+.zoryn-low-stock-alert {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 74, 74, 0.24);
+    background: rgba(96, 0, 0, 0.28);
+    color: #ff5a4f;
+    font-weight: 700;
+}
+.zoryn-row-warning {
+    background: rgba(120, 22, 22, 0.16);
+}
+.zoryn-rank-pill {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f2d27a, #c99a1c);
+    color: #111111;
+    font-weight: 800;
+}
+.zoryn-pnl-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.zoryn-pnl-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    border-radius: 18px;
+    padding: 1rem 1.1rem;
+    font-weight: 700;
+}
+.zoryn-pnl-item span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.zoryn-pnl-positive {
+    background: rgba(18, 111, 53, 0.18);
+    border: 1px solid rgba(68, 201, 115, 0.22);
+    color: #44c973;
+}
+.zoryn-pnl-negative {
+    background: rgba(153, 36, 36, 0.16);
+    border: 1px solid rgba(255, 89, 89, 0.2);
+    color: #ff5a4f;
+}
+canvas {
+    max-width: 100%;
+}
+
+
+
+/* ===== batch2.css ===== */
+
+.order-kitchen-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .4rem .75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, .18);
+    background: rgba(255,255,255,.04);
+    color: var(--zoryn-gold-soft);
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.table-status-card {
+    border-radius: 22px;
+    border: 1px solid var(--zoryn-border);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+.table-status-card .badge {
+    letter-spacing: .04em;
+}
+
+
+
+/* ===== batch3.css ===== */
+
+.reservation-time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    padding: .42rem .8rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, .18);
+    background: rgba(255,255,255,.04);
+    color: var(--zoryn-gold-soft);
+    font-size: .85rem;
+    font-weight: 700;
+}
+
+.reservation-card {
+    border-radius: 22px;
+    border: 1px solid var(--zoryn-border);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch4.css ===== */
+
+.print-card {
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+    border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.receipt-total-row th,
+.receipt-total-row td {
+    font-size: 1.05rem;
+}
+
+
+
+/* ===== batch5.css ===== */
+
+.kds-card {
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+    border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.print-card {
+    border-radius: 24px;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+    border: 1px solid rgba(212, 175, 55, 0.18);
+}
+
+.receipt-total-row th,
+.receipt-total-row td {
+    font-size: 1.05rem;
+}
+
+
+
+/* ===== batch6.css ===== */
+
+.calendar-day-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+.adjustment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .35rem .65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(212, 175, 55, .18);
+    background: rgba(255,255,255,.04);
+    color: var(--zoryn-gold-soft);
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+
+
+/* ===== batch7.css ===== */
+
+.shift-stat-card,
+.audit-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch8.css ===== */
+
+.inventory-summary-card,
+.supplier-card,
+.purchase-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch9.css ===== */
+
+.payables-card,
+.payment-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch10.css ===== */
+
+.ap-aging-card,
+.ap-term-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch11.css ===== */
+
+.analytics-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+canvas {
+    max-width: 100%;
+}
+
+
+
+/* ===== batch12.css ===== */
+
+.reporting-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch13.css ===== */
+
+.customer-card,
+.loyalty-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== batch14.css ===== */
+
+.promo-card,
+.birthday-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+
+
+/* ===== Final cleanup and analytics fixes ===== */
+
+/* Shared card surfaces to reduce duplicated styling across feature cards */
+.analytics-card,
+.reporting-card,
+.customer-card,
+.loyalty-card,
+.promo-card,
+.birthday-card,
+.calendar-day-card,
+.shift-stat-card,
+.audit-card,
+.inventory-summary-card,
+.supplier-card,
+.purchase-card,
+.payables-card,
+.payment-card,
+.ap-aging-card,
+.ap-term-card,
+.table-status-card,
+.reservation-card,
+.print-card,
+.kds-card {
+    border-radius: 22px;
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.92), rgba(11, 11, 11, 0.96));
+}
+
+/* Keep the main content tall enough, but do not force nested cards/charts to full viewport height */
+.content-area {
+    min-height: 100vh;
+    height: auto;
+}
+
+/* Analytics layout fixes */
+.analytics-card {
+    overflow: hidden;
+}
+
+.analytics-card .card-body {
+    height: auto;
+    min-height: 0;
+}
+
+/* Prevent chart sections from stretching the full page */
+.analytics-card canvas {
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+    height: auto !important;
+    max-height: 340px !important;
+}
+
+/* Target analytics charts specifically */
+#monthlyChart {
+    height: 320px !important;
+    max-height: 320px !important;
+}
+
+#paymentChart {
+    height: 280px !important;
+    max-height: 280px !important;
+}
+
+/* Tables inside cards should not push excessive layout height */
+.analytics-card .table-responsive {
+    overflow-x: auto;
+    overflow-y: visible;
+}
+
+/* Safer spacing on analytics page */
+@media (min-width: 992px) {
+    .analytics-card h5 {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Mobile tune-ups */
+@media (max-width: 991.98px) {
+    #monthlyChart {
+        height: 280px !important;
+        max-height: 280px !important;
+    }
+
+    #paymentChart {
+        height: 240px !important;
+        max-height: 240px !important;
+    }
+}
