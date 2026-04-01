@@ -1,7 +1,7 @@
 <?php
 return [
     'app_name' => 'Zoryn Restaurant',
-    'base_url' => 'http://localhost/ZorynRestaurant',
+    'base_url' => 'http://localhost/Zoryn',
     'db' => [
         'host' => 'localhost',
         'dbname' => 'zoryn_restaurant',

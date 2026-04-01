@@ -21,7 +21,8 @@ class SupplierPurchaseOrder extends Model
     public function getItems(int $poId): array
     {
         $this->db->query("
-            SELECT spoi.*, g.grocery_name, g.unit
+            SELECT spoi.*, g.grocery_name, g.unit,
+                   (spoi.ordered_qty - spoi.received_qty) AS balance_qty
             FROM supplier_purchase_order_items spoi
             INNER JOIN groceries g ON g.id = spoi.grocery_id
             WHERE spoi.po_id = :po_id
@@ -48,57 +49,6 @@ class SupplierPurchaseOrder extends Model
         return $row;
     }
 
-    public function createFromPlanBySupplier(int $planId, int $supplierId, array $items, ?int $createdBy, ?string $expectedDate = null, ?string $notes = null): int|false
-    {
-        $poNo = 'PO-' . date('Ymd-His') . '-' . rand(100,999);
-
-        $subtotal = 0;
-        foreach ($items as $item) {
-            $subtotal += (float)($item['approved_qty'] ?? 0) * (float)($item['unit_cost'] ?? 0);
-        }
-
-        $this->db->query("
-            INSERT INTO supplier_purchase_orders (
-                po_no, plan_id, supplier_id, po_date, expected_date, status, subtotal, notes, created_by, created_at
-            ) VALUES (
-                :po_no, :plan_id, :supplier_id, CURDATE(), :expected_date, 'draft', :subtotal, :notes, :created_by, NOW()
-            )
-        ");
-        $this->db->bind(':po_no', $poNo);
-        $this->db->bind(':plan_id', $planId);
-        $this->db->bind(':supplier_id', $supplierId);
-        $this->db->bind(':expected_date', $expectedDate ?: null);
-        $this->db->bind(':subtotal', $subtotal);
-        $this->db->bind(':notes', $notes ?: null);
-        $this->db->bind(':created_by', $createdBy);
-
-        if (!$this->db->execute()) return false;
-        $poId = (int)$this->db->lastInsertId();
-
-        foreach ($items as $item) {
-            $orderedQty = (float)($item['approved_qty'] ?? 0);
-            $unitCost = (float)($item['unit_cost'] ?? 0);
-            if ($orderedQty <= 0) continue;
-
-            $this->db->query("
-                INSERT INTO supplier_purchase_order_items (
-                    po_id, plan_item_id, grocery_id, ordered_qty, received_qty, unit_cost, line_total
-                ) VALUES (
-                    :po_id, :plan_item_id, :grocery_id, :ordered_qty, 0, :unit_cost, :line_total
-                )
-            ");
-            $this->db->bind(':po_id', $poId);
-            $this->db->bind(':plan_item_id', $item['id'] ?? null);
-            $this->db->bind(':grocery_id', $item['grocery_id']);
-            $this->db->bind(':ordered_qty', $orderedQty);
-            $this->db->bind(':unit_cost', $unitCost);
-            $this->db->bind(':line_total', $orderedQty * $unitCost);
-            if (!$this->db->execute()) return false;
-        }
-
-        return $poId;
-    }
-
     public function updateStatus(int $poId, string $status): bool
     {
         $this->db->query("UPDATE supplier_purchase_orders SET status = :status WHERE id = :id");
@@ -107,16 +57,113 @@ class SupplierPurchaseOrder extends Model
         return $this->db->execute();
     }
 
-    public function updateReceivedQty(int $itemId, float $receivedQty): bool
+    public function receiveLine(int $itemId, float $deliveredQty): bool
     {
         $this->db->query("
+            SELECT po_id, ordered_qty, received_qty
+            FROM supplier_purchase_order_items
+            WHERE id = :id
+            LIMIT 1
+        ");
+        $this->db->bind(':id', $itemId);
+        $item = $this->db->single();
+        if (!$item) return false;
+
+        $ordered = (float)($item['ordered_qty'] ?? 0);
+        $received = (float)($item['received_qty'] ?? 0);
+        $newReceived = $received + max(0, $deliveredQty);
+        if ($newReceived > $ordered) $newReceived = $ordered;
+
+        $lineStatus = 'open';
+        if ($newReceived <= 0) {
+            $lineStatus = 'open';
+        } elseif ($newReceived < $ordered) {
+            $lineStatus = 'partial';
+        } else {
+            $lineStatus = 'received';
+        }
+
+        $this->db->query("
             UPDATE supplier_purchase_order_items
-            SET received_qty = :received_qty
+            SET received_qty = :received_qty,
+                last_received_at = NOW(),
+                line_status = :line_status
             WHERE id = :id
         ");
-        $this->db->bind(':received_qty', $receivedQty);
+        $this->db->bind(':received_qty', $newReceived);
+        $this->db->bind(':line_status', $lineStatus);
         $this->db->bind(':id', $itemId);
+        $ok = $this->db->execute();
+
+        if ($ok) {
+            $this->refreshPOStatus((int)$item['po_id']);
+        }
+
+        return $ok;
+    }
+
+    public function refreshPOStatus(int $poId): bool
+    {
+        $this->db->query("
+            SELECT
+                SUM(CASE WHEN line_status = 'received' THEN 1 ELSE 0 END) AS received_lines,
+                SUM(CASE WHEN line_status = 'partial' THEN 1 ELSE 0 END) AS partial_lines,
+                SUM(CASE WHEN line_status = 'open' THEN 1 ELSE 0 END) AS open_lines,
+                COUNT(*) AS total_lines
+            FROM supplier_purchase_order_items
+            WHERE po_id = :po_id
+        ");
+        $this->db->bind(':po_id', $poId);
+        $summary = $this->db->single() ?: [];
+
+        $status = 'issued';
+        $receivedLines = (int)($summary['received_lines'] ?? 0);
+        $partialLines = (int)($summary['partial_lines'] ?? 0);
+        $openLines = (int)($summary['open_lines'] ?? 0);
+        $totalLines = (int)($summary['total_lines'] ?? 0);
+
+        if ($totalLines > 0 && $receivedLines === $totalLines) {
+            $status = 'received';
+        } elseif ($partialLines > 0 || ($receivedLines > 0 && $openLines > 0)) {
+            $status = 'partially_received';
+        } else {
+            $status = 'issued';
+        }
+
+        $this->db->query("UPDATE supplier_purchase_orders SET status = :status WHERE id = :id");
+        $this->db->bind(':status', $status);
+        $this->db->bind(':id', $poId);
         return $this->db->execute();
+    }
+
+    public function getOpenBalances(): array
+    {
+        $this->db->query("
+            SELECT
+                spo.id AS po_id,
+                spoi.id AS po_item_id,
+                spo.po_no,
+                spo.po_date,
+                spo.expected_date,
+                spo.status AS po_status,
+                s.id AS supplier_id,
+                s.supplier_name,
+                g.id AS grocery_id,
+                g.grocery_name,
+                g.unit,
+                spoi.ordered_qty,
+                spoi.received_qty,
+                (spoi.ordered_qty - spoi.received_qty) AS balance_qty,
+                spoi.unit_cost,
+                spoi.line_status
+            FROM supplier_purchase_order_items spoi
+            INNER JOIN supplier_purchase_orders spo ON spo.id = spoi.po_id
+            INNER JOIN suppliers s ON s.id = spo.supplier_id
+            INNER JOIN groceries g ON g.id = spoi.grocery_id
+            WHERE spoi.ordered_qty > spoi.received_qty
+            ORDER BY spo.po_date DESC, s.supplier_name ASC, g.grocery_name ASC
+        ");
+        return $this->db->resultSet();
     }
 
     public function getSummary(): array

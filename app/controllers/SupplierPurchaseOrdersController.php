@@ -6,108 +6,77 @@ class SupplierPurchaseOrdersController extends Controller
         $this->requireLogin();
 
         $poModel = $this->model('SupplierPurchaseOrder');
-        $planModel = $this->model('PurchasePlan');
+        $deliveryModel = $this->model('SupplierDeliveryLog');
 
         $this->view('supplier_purchase_orders/index', [
             'title' => 'Supplier Purchase Orders',
             'summary' => $poModel->getSummary(),
             'pos' => $poModel->getAll(),
-            'plans' => $planModel->getAll(),
+            'open_balances' => $poModel->getOpenBalances(),
+            'supplier_performance' => $deliveryModel->getSupplierPerformance(),
+            'recent_deliveries' => $deliveryModel->getRecentLogs(),
         ]);
     }
 
-    public function createFromPlan($planId): void
+    public function receiveLine($itemId): void
     {
         $this->requireLogin();
 
-        $planModel = $this->model('PurchasePlan');
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            $this->redirect('supplierpurchaseorders/index');
+            return;
+        }
+
         $poModel = $this->model('SupplierPurchaseOrder');
+        $deliveryModel = $this->model('SupplierDeliveryLog');
 
-        $plan = $planModel->findById((int)$planId);
-        if (!$plan || ($plan['status'] ?? '') !== 'approved') {
-            $_SESSION['error'] = 'Only approved plans can be converted to purchase orders.';
+        $poId = (int)($_POST['po_id'] ?? 0);
+        $supplierId = (int)($_POST['supplier_id'] ?? 0);
+        $groceryId = (int)($_POST['grocery_id'] ?? 0);
+        $deliveredQty = (float)($_POST['delivered_qty'] ?? 0);
+        $deliveryDate = trim($_POST['delivery_date'] ?? date('Y-m-d'));
+        $expectedDate = trim($_POST['expected_date'] ?? '');
+        $notes = trim($_POST['notes'] ?? '');
+
+        if ($deliveredQty <= 0) {
+            $_SESSION['error'] = 'Delivered quantity must be greater than 0.';
             $this->redirect('supplierpurchaseorders/index');
             return;
         }
 
-        $itemsBySupplier = [];
-        foreach (($plan['items'] ?? []) as $item) {
-            $supplierId = (int)($item['supplier_id'] ?? 0);
-            if ($supplierId <= 0) continue;
-            $itemsBySupplier[$supplierId][] = $item;
-        }
+        $ok = $poModel->receiveLine((int)$itemId, $deliveredQty);
 
-        if (empty($itemsBySupplier)) {
-            $_SESSION['error'] = 'No supplier assigned to approved plan items.';
-            $this->redirect('supplierpurchaseorders/index');
-            return;
-        }
+        if ($ok) {
+            $leadDaysActual = null;
+            if ($expectedDate !== '') {
+                $d1 = new DateTime($deliveryDate);
+                $d2 = new DateTime($expectedDate);
+                $leadDaysActual = (int)$d2->diff($d1)->format('%r%a');
+            }
 
-        $created = 0;
-        foreach ($itemsBySupplier as $supplierId => $items) {
-            $poId = $poModel->createFromPlanBySupplier((int)$planId, $supplierId, $items, (int)($_SESSION['user']['id'] ?? 0), null, 'Generated from approved plan');
-            if ($poId) $created++;
-        }
+            $onTime = 0;
+            if ($expectedDate !== '' && $deliveryDate <= $expectedDate) {
+                $onTime = 1;
+            }
 
-        if ($created > 0) {
-            $planModel->updateStatus((int)$planId, 'converted', (int)($_SESSION['user']['id'] ?? 0));
-            $_SESSION['success'] = $created . ' supplier purchase order(s) created from approved plan.';
+            $deliveryModel->create([
+                'po_id' => $poId,
+                'po_item_id' => (int)$itemId,
+                'supplier_id' => $supplierId,
+                'grocery_id' => $groceryId,
+                'delivered_qty' => $deliveredQty,
+                'delivery_date' => $deliveryDate,
+                'expected_date' => $expectedDate !== '' ? $expectedDate : null,
+                'lead_days_actual' => $leadDaysActual,
+                'on_time_flag' => $onTime,
+                'notes' => $notes,
+            ]);
+
+            $_SESSION['success'] = 'PO line received successfully.';
         } else {
-            $_SESSION['error'] = 'Failed to create supplier purchase orders.';
+            $_SESSION['error'] = 'Failed to receive PO line.';
         }
 
         $this->redirect('supplierpurchaseorders/index');
-    }
-
-    public function issue($poId): void
-    {
-        $this->requireLogin();
-        $poModel = $this->model('SupplierPurchaseOrder');
-        $poModel->updateStatus((int)$poId, 'issued');
-        $_SESSION['success'] = 'Purchase order issued.';
-        $this->redirect('supplierpurchaseorders/index');
-    }
-
-    public function print($poId): void
-    {
-        $this->requireLogin();
-        $poModel = $this->model('SupplierPurchaseOrder');
-        $po = $poModel->findById((int)$poId);
-
-        if (!$po) {
-            $_SESSION['error'] = 'Purchase order not found.';
-            $this->redirect('supplierpurchaseorders/index');
-            return;
-        }
-
-        $this->view('supplier_purchase_orders/print', [
-            'title' => 'Print Purchase Order',
-            'po' => $po,
-        ]);
-    }
-
-    public function createReceivingFromPO($poId): void
-    {
-        $this->requireLogin();
-
-        $poModel = $this->model('SupplierPurchaseOrder');
-        $purchaseModel = $this->model('GroceryPurchase');
-
-        $po = $poModel->findById((int)$poId);
-        if (!$po) {
-            $_SESSION['error'] = 'Purchase order not found.';
-            $this->redirect('supplierpurchaseorders/index');
-            return;
-        }
-
-        $purchaseId = $purchaseModel->createFromPO($po, $po['items'] ?? [], (int)($_SESSION['user']['id'] ?? 0));
-        if ($purchaseId) {
-            $poModel->updateStatus((int)$poId, 'partially_received');
-            $_SESSION['success'] = 'Receiving draft created from purchase order.';
-        } else {
-            $_SESSION['error'] = 'Failed to create receiving draft from PO.';
-        }
-
-        $this->redirect('grocerypurchases/index');
     }
 }
